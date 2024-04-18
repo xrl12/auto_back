@@ -3,7 +3,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # 存储文件变化的日志文件
-log_file = "changes.log"
+log_file = "../changes.log"
 
 
 class WatchFiles(object):
@@ -18,8 +18,9 @@ class WatchFiles(object):
         停止当前文件监听
         :return:
         """
-        cls.observer.stop()
-        cls.observer.join()
+        if cls.observer.is_alive():
+            cls.observer.stop()
+            cls.observer.join()
 
     @classmethod
     def main(cls, file_path, handler):
@@ -41,15 +42,17 @@ class WatchFiles(object):
 
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
+        # 记录新增文件及其位置
+        print('新增了文件', event)
+
         if not event.is_directory:
-            # 记录新增文件及其位置
             with open(log_file, "a") as f:
                 f.write(f"Added: {event.src_path}\n")
 
     def on_modified(self, event):
         if not event.is_directory:
             # 记录修改文件及其位置
-            print(event.__dict__)
+            # print(event.__dict__)
             with open(log_file, "a") as f:
                 f.write(f"Modified: {event.src_path}\n")
 
