@@ -35,7 +35,7 @@ class TestValidFileUtils(unittest.TestCase):
     def test_check_path_is_already_is_error(self):
         res = ValidFileUtils.check_dir_is_already('error_path')
         self.assertFalse(res[0])
-    
+
 
 if __name__ == '__main__':
     unittest.main()

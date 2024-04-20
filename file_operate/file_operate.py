@@ -1,17 +1,20 @@
 from watchdog.events import FileSystemEventHandler
-from signal import Signals
-import os
 from utils.valid_file_utils import ValidFileUtils
+from utils.operate_file_utils import OperateFileUtils
 
 
 class FileOperate(FileSystemEventHandler):
-    def __init__(self, backup_path, *args, **kwargs):
+    def __init__(self, backup_path, source_path, *args, **kwargs):
         super().__init__(*args, **kwargs)
         res, msg = ValidFileUtils.check_dir_is_already(backup_path)
         if not res:
             raise RuntimeError(msg)
-        else:
-            self.backup_path = backup_path
+        res, msg = ValidFileUtils.check_dir_is_already(source_path)
+        if not res:
+            raise RuntimeError(msg)
+
+        self.backup_path = backup_path
+        self.source_path = source_path
 
     def on_created(self, event):
         """
@@ -19,11 +22,11 @@ class FileOperate(FileSystemEventHandler):
         :param event:
         :return:
         """
-        print('新增了文件', event.__dict__)
         src_path = event.src_path
-
+        OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
 
     def on_modified(self, event):
+        pass
         print(event.__dict__, '修改了内容')
         if not event.is_directory:
             pass
@@ -33,9 +36,8 @@ class FileOperate(FileSystemEventHandler):
             #     f.write(f"Modified: {event.src_path}\n")
 
     def on_deleted(self, event):
-        print('删除了文件', event.__dict__)
-        if not event.is_directory:
-            pass
-            # 记录删除文件及其位置
-            # with open(log_file, "a") as f:
-            #     f.write(f"Deleted: {event.src_path}\n")
+        src_path = event.src_path
+        OperateFileUtils.del_file(src_path, self.backup_path, self.source_path)
+        # 记录删除文件及其位置
+        # with open(log_file, "a") as f:
+        #     f.write(f"Deleted: {event.src_path}\n")

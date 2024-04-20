@@ -4,13 +4,13 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFormLayout, QPushButton,
 
 from PyQt5.QtCore import pyqtSignal, QThread
 from watch.watch_file import WatchFiles
-from utils.file_operate import FileOperate
+from file_operate.file_operate import FileOperate
 
 
 class FileSelectionWidget(QWidget):
     dir_selected = pyqtSignal(str)  # 新定义一
 
-    def __init__(self, parent, label_font, btn_button, layout: QLayout):
+    def __init__(self, parent, label_font, btn_button, layout: QLayout, debug: bool, choice_dir: str = None):
         super().__init__(parent)
         label = QLabel(label_font)
         self.button = QPushButton(btn_button, self)
@@ -19,11 +19,19 @@ class FileSelectionWidget(QWidget):
 
         layout.addRow(label, self.button)
         self.button.clicked.connect(self.select_file)
+        if debug and not choice_dir:
+            raise RuntimeError('当debug是true 当时候choice_dir是必填当')
+        if debug:
+            self.__choice_dir(choice_dir)
 
     def select_file(self):
         choice_dir = QFileDialog.getExistingDirectory(self, 'Select File')
         if choice_dir:
             self.button.setText(choice_dir)
+        self.dir_selected.emit(choice_dir)
+
+    def __choice_dir(self, choice_dir):
+        self.button.setText(choice_dir)
         self.dir_selected.emit(choice_dir)
 
 
@@ -49,7 +57,7 @@ class MyWindow(QMainWindow):
     如果继承了QMainWindow的类，则不能直接创建布局，需要使用QWidget去创建布局
     """
 
-    def __init__(self):
+    def __init__(self, debug=False):
         super().__init__()
         self.setMinimumSize(300, 150)  # 设置最小宽和高
         self.setMaximumSize(300, 150)  # 设置最大宽和高
@@ -59,6 +67,7 @@ class MyWindow(QMainWindow):
         self.source_file_selection_widget = None
         self.target_file_selection_widget = None
         self.work_thread = None
+        self.debug = debug
         self.setWindowTitle('自动备份app')
         self.create_form_layout()
 
@@ -73,12 +82,20 @@ class MyWindow(QMainWindow):
         # 创建表单布局
         form_layout = QFormLayout()
         form_layout.setVerticalSpacing(10)
-        self.source_file_selection_widget = FileSelectionWidget(self, '源目录', '选择监听目录', form_layout)
-        self.target_file_selection_widget = FileSelectionWidget(self, '目标目录', '选择备份目录', form_layout)
+        source_path = '/Users/xuruilong/Desktop/test_dir'
+        target_path = '/Users/xuruilong/Desktop/test_dir1'
+        self.source_file_selection_widget = FileSelectionWidget(self, '源目录', '选择监听目录', form_layout, self.debug,
+                                                                source_path)
+        self.target_file_selection_widget = FileSelectionWidget(self, '目标目录', '选择备份目录', form_layout,
+                                                                self.debug, target_path)
         widget.setLayout(form_layout)
+
         # 监听选择文件信号
         self.source_file_selection_widget.dir_selected.connect(lambda x: self.handle_selected_directory(x, 'source'))
         self.target_file_selection_widget.dir_selected.connect(lambda x: self.handle_selected_directory(x, 'target'))
+        if self.debug:
+            self.handle_selected_directory(source_path, 'source')
+            self.handle_selected_directory(target_path, 'target')
 
     def clear_choice_dir(self):
         """
@@ -110,7 +127,7 @@ class MyWindow(QMainWindow):
         setattr(self, attr, directory)
 
         if self.source_dir and self.target_dir:
-            self.work_thread = WorkerThread(WatchFiles, self.source_dir, FileOperate(self.target_dir))
+            self.work_thread = WorkerThread(WatchFiles, self.source_dir, FileOperate(self.target_dir, self.source_dir))
             # 判断源目录和目标目录是否一样
             if self.source_dir == self.target_dir:
                 self.clear_choice_dir()
@@ -129,6 +146,6 @@ class MyWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MyWindow()
+    window = MyWindow(True)
     window.show()
     sys.exit(app.exec_())
