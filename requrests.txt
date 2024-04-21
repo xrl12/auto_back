@@ -1,9 +1,11 @@
-Package    Version
----------- -------
-pip        23.3.2
-PyQt5      5.15.10
-PyQt5-Qt5  5.15.13
-PyQt5-sip  12.13.0
-setuptools 69.0.3
-watchdog   4.0.0
-wheel      0.42.0
+altgraph==0.17.4
+importlib_metadata==7.1.0
+macholib==1.16.3
+packaging==24.0
+pyinstaller==6.6.0
+pyinstaller-hooks-contrib==2024.4
+PyQt5==5.15.10
+PyQt5-Qt5==5.15.13
+PyQt5-sip==12.13.0
+watchdog==4.0.0
+zipp==3.18.1
