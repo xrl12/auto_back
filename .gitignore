@@ -2,3 +2,6 @@
 .idea/
 .git/q
 *.log
+*.spec
+build/
+dist/
