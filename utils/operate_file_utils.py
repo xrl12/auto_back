@@ -71,8 +71,19 @@ class OperateFileUtils(object):
 
     @classmethod
     def del_file(cls, source_path, target_path, source_base_path):
-        print(source_path, target_path, source_base_path)
         source_relative_path = cls.get_relative_path(source_path, source_base_path)
         target_path = Path(target_path).joinpath(source_relative_path)
         if os.path.exists(target_path):
-            shutil.rmtree(target_path)
+            if os.path.isdir(target_path):
+                shutil.rmtree(target_path)
+            else:
+                os.remove(target_path)
+
+    @classmethod
+    def moved_file(cls, move_before, move_after, source_base_path, target_path):
+        before_relative_path = cls.get_relative_path(move_before, source_base_path)
+        before_target_move_path = Path(target_path).joinpath(before_relative_path)
+
+        move_relative_path = cls.get_relative_path(move_after, source_base_path)
+        after_target_move_path = Path(target_path).joinpath(move_relative_path)
+        shutil.move(before_target_move_path, after_target_move_path)

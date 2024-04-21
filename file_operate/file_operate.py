@@ -1,4 +1,5 @@
-from watchdog.events import FileSystemEventHandler
+import os
+from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from utils.valid_file_utils import ValidFileUtils
 from utils.operate_file_utils import OperateFileUtils
 
@@ -26,14 +27,8 @@ class FileOperate(FileSystemEventHandler):
         OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
 
     def on_modified(self, event):
-        pass
-        print(event.__dict__, '修改了内容')
-        if not event.is_directory:
-            pass
-            # 记录修改文件及其位置
-
-            # with open(log_file, "a") as f:
-            #     f.write(f"Modified: {event.src_path}\n")
+        src_path = event.src_path
+        OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
 
     def on_deleted(self, event):
         src_path = event.src_path
@@ -41,3 +36,7 @@ class FileOperate(FileSystemEventHandler):
         # 记录删除文件及其位置
         # with open(log_file, "a") as f:
         #     f.write(f"Deleted: {event.src_path}\n")
+
+    def on_moved(self, event: FileSystemEvent):
+        print('event', event.__dict__)
+        OperateFileUtils.moved_file(event.src_path, event.dest_path, self.source_path, self.backup_path, )

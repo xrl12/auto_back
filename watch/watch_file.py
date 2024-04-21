@@ -50,11 +50,16 @@ class MyHandler(FileSystemEventHandler):
                 f.write(f"Added: {event.src_path}\n")
 
     def on_modified(self, event):
-        if not event.is_directory:
-            # 记录修改文件及其位置
-            # print(event.__dict__)
-            with open(log_file, "a") as f:
-                f.write(f"Modified: {event.src_path}\n")
+        pass
+        # print(event)
+        # if not event.is_directory:
+        # 记录修改文件及其位置
+        # print(event.__dict__)
+        # with open(log_file, "a") as f:
+        #     f.write(f"Modified: {event.src_path}\n")
+
+    def on_moved(self, event):
+        print('moved', event.__dict__)
 
     def on_deleted(self, event):
         if not event.is_directory:

@@ -88,6 +88,7 @@ class MyWindow(QMainWindow):
                                                                 source_path)
         self.target_file_selection_widget = FileSelectionWidget(self, '目标目录', '选择备份目录', form_layout,
                                                                 self.debug, target_path)
+
         widget.setLayout(form_layout)
 
         # 监听选择文件信号
@@ -146,6 +147,6 @@ class MyWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MyWindow(True)
+    window = MyWindow(False)
     window.show()
     sys.exit(app.exec_())
