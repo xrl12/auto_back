@@ -23,20 +23,31 @@ class FileOperate(FileSystemEventHandler):
         :param event:
         :return:
         """
-        src_path = event.src_path
-        OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
+        try:
+            src_path = event.src_path
+            OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
+        except BaseException as ex:
+            print(ex)
 
     def on_modified(self, event):
-        src_path = event.src_path
-        OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
+        try:
+            src_path = event.src_path
+            OperateFileUtils.cp_file(src_path, self.backup_path, self.source_path)
+        except BaseException as ex:
+            print(ex)
 
     def on_deleted(self, event):
-        src_path = event.src_path
-        OperateFileUtils.del_file(src_path, self.backup_path, self.source_path)
+        try:
+            src_path = event.src_path
+            OperateFileUtils.del_file(src_path, self.backup_path, self.source_path)
+        except BaseException as ex:
+            print(ex)
         # 记录删除文件及其位置
         # with open(log_file, "a") as f:
         #     f.write(f"Deleted: {event.src_path}\n")
 
     def on_moved(self, event: FileSystemEvent):
-        print('event', event.__dict__)
-        OperateFileUtils.moved_file(event.src_path, event.dest_path, self.source_path, self.backup_path, )
+        try:
+            OperateFileUtils.moved_file(event.src_path, event.dest_path, self.source_path, self.backup_path, )
+        except BaseException as ex:
+            print(ex)

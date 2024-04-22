@@ -38,36 +38,3 @@ class WatchFiles(object):
         finally:
             cls.observer.stop()
             cls.observer.join()
-
-
-class MyHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        # 记录新增文件及其位置
-        print('新增了文件', event)
-
-        if not event.is_directory:
-            with open(log_file, "a") as f:
-                f.write(f"Added: {event.src_path}\n")
-
-    def on_modified(self, event):
-        pass
-        # print(event)
-        # if not event.is_directory:
-        # 记录修改文件及其位置
-        # print(event.__dict__)
-        # with open(log_file, "a") as f:
-        #     f.write(f"Modified: {event.src_path}\n")
-
-    def on_moved(self, event):
-        print('moved', event.__dict__)
-
-    def on_deleted(self, event):
-        if not event.is_directory:
-            # 记录删除文件及其位置
-            with open(log_file, "a") as f:
-                f.write(f"Deleted: {event.src_path}\n")
-
-
-if __name__ == "__main__":
-    file_path = 'test_path'
-    WatchFiles.main(file_path, MyHandler())
