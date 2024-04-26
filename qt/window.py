@@ -5,51 +5,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFormLayout, QPushButton,
 from PyQt5.QtCore import pyqtSignal, QThread
 from watch.watch_file import WatchFiles
 from file_operate.file_operate import FileOperate
-
-
-class FileSelectionWidget(QWidget):
-    dir_selected = pyqtSignal(str)  # 新定义一
-
-    def __init__(self, parent, label_font, btn_button, layout: QLayout, debug: bool, choice_dir: str = None):
-        super().__init__(parent)
-        label = QLabel(label_font)
-        self.button = QPushButton(btn_button, self)
-        # self.line_edit = QLineEdit()
-        # self.line_edit.setReadOnly(True)
-
-        layout.addRow(label, self.button)
-        self.button.clicked.connect(self.select_file)
-        if debug and not choice_dir:
-            raise RuntimeError('当debug是true 当时候choice_dir是必填当')
-        if debug:
-            self.__choice_dir(choice_dir)
-
-    def select_file(self):
-        choice_dir = QFileDialog.getExistingDirectory(self, 'Select File')
-        if choice_dir:
-            self.button.setText(choice_dir)
-        self.dir_selected.emit(choice_dir)
-
-    def __choice_dir(self, choice_dir):
-        self.button.setText(choice_dir)
-        self.dir_selected.emit(choice_dir)
-
-
-class WorkerThread(QThread):
-    finished = pyqtSignal()
-
-    def __init__(self, watch_obj, source_file, handler, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.watch_obj = watch_obj
-        self.source_file = source_file
-        self.handler = handler
-
-    def run(self):
-        self.watch_obj.main(self.source_file, self.handler)
-
-    def stop(self):
-        self.watch_obj.stop()
-        self.is_running = False
+from qt.file_select_on_widget import FileSelectionWidget
+from thread import WorkerThread
 
 
 class MyWindow(QMainWindow):
@@ -88,7 +45,13 @@ class MyWindow(QMainWindow):
                                                                 source_path)
         self.target_file_selection_widget = FileSelectionWidget(self, '目标目录', '选择备份目录', form_layout,
                                                                 self.debug, target_path)
-
+        # button = QPushButton('关闭线程', self)
+        # button.clicked.connect(self.stop_son_thread)
+        #
+        # start_btn = QPushButton('打开线程', self);
+        # start_btn.clicked.connect(self.main)
+        # form_layout.addWidget(start_btn)
+        # form_layout.addWidget(button)
         widget.setLayout(form_layout)
 
         # 监听选择文件信号
@@ -128,12 +91,14 @@ class MyWindow(QMainWindow):
         setattr(self, attr, directory)
 
         if self.source_dir and self.target_dir:
+            if self.work_thread is not None:
+                self.work_thread.stop()
+                self.work_thread = None
             self.work_thread = WorkerThread(WatchFiles, self.source_dir, FileOperate(self.target_dir, self.source_dir))
             # 判断源目录和目标目录是否一样
             if self.source_dir == self.target_dir:
                 self.clear_choice_dir()
                 QMessageBox.warning(self, 'Error', '源目录和目标目录一样，请重新选择')
-                self.watch_file.stop()
             else:
                 self.main()
 
@@ -142,7 +107,17 @@ class MyWindow(QMainWindow):
         程序主函数，开始运行函数
         :return:
         """
+        # if self.work_thread.isRunning():
+        #     self.work_thread.stop()
+        # if self.work_thread is None:
+        #     self.work_thread = WorkerThread(WatchFiles, self.source_dir, FileOperate(self.target_dir, self.source_dir))
         self.work_thread.start()
+
+    # def stop_son_thread(self):
+    #     print(self.work_thread.isRunning())
+    #     # if self.work_thread.isRunning():
+    #     self.work_thread.stop()
+    #     self.work_thread.terminate()
 
 
 if __name__ == '__main__':

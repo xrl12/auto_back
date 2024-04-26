@@ -16,11 +16,17 @@ class WatchFiles(object):
     def stop(cls):
         """
         停止当前文件监听
+        因为每个线程对象只能调用一下start所以这里在把哈上一次的终止完成之后从新创建一个observer对象
         :return:
         """
         if cls.observer.is_alive():
+            # cls.is_stop = True
             cls.observer.stop()
-            cls.observer.join()
+            cls.observer.join(1)
+            # https://python-watchdog.readthedocs.io/en/stable/api.html#module-watchdog.observers
+            cls.observer = Observer()
+            # cls.is_stop = True
+            # cls.observer.stop()
 
     @classmethod
     def main(cls, file_path, handler):
@@ -28,13 +34,14 @@ class WatchFiles(object):
             raise ValueError('handler 必须是FileSystemEventHandler类')
 
         # 创建 Observer 对象并启动监视
-        # observer = Observer()
         cls.observer.schedule(handler, path=file_path, recursive=True)
         cls.observer.start()
+
         try:
-            i = 0
+            # i = 0
             while cls.observer.is_alive():
-                cls.observer.join(1)
+                time.sleep(1)
+            cls.observer.join(1)
         finally:
             cls.observer.stop()
             cls.observer.join()
