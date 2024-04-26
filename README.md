@@ -42,6 +42,7 @@ C:\Users\29966\PycharmProjects\auto_back\main.py 项目路径
 - [x] 监听源目录，并自动拷贝到目标目录
 - [ ] 用户自己设置轮询时间（多久备份一次）
 - [ ] 开始监听的时候，自动把源目录所有的文件备份到目标盘
+- [ ] 做一个版本控制
 
 ## 结束
 感谢[watchdog](https://github.com/gorakhargosh/watchdog)。
