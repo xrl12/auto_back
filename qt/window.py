@@ -1,12 +1,15 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFormLayout, QPushButton, QLabel, QWidget, QFileDialog, \
-    QLayout, QMessageBox
+    QLayout, QMessageBox, QTextEdit
 
 from PyQt5.QtCore import pyqtSignal, QThread
 from watch.watch_file import WatchFiles
 from file_operate.file_operate import FileOperate
 from qt.file_select_on_widget import FileSelectionWidget
+from qt.selection_widget import SelectionWidget
 from thread import WorkerThread
+from settings import TIME_UNIT
+from utils.settings_utils import SettingsUtils
 
 
 class MyWindow(QMainWindow):
@@ -23,6 +26,7 @@ class MyWindow(QMainWindow):
         self.watch_file = WatchFiles
         self.source_file_selection_widget = None
         self.target_file_selection_widget = None
+        self.selection_widget = SelectionWidget(SettingsUtils.transfer_dict_to_list(TIME_UNIT))
         self.work_thread = None
         self.debug = debug
         self.setWindowTitle('自动备份app')
@@ -45,13 +49,7 @@ class MyWindow(QMainWindow):
                                                                 source_path)
         self.target_file_selection_widget = FileSelectionWidget(self, '目标目录', '选择备份目录', form_layout,
                                                                 self.debug, target_path)
-        # button = QPushButton('关闭线程', self)
-        # button.clicked.connect(self.stop_son_thread)
-        #
-        # start_btn = QPushButton('打开线程', self);
-        # start_btn.clicked.connect(self.main)
-        # form_layout.addWidget(start_btn)
-        # form_layout.addWidget(button)
+        form_layout.addRow(QLabel('请选择时间间隔'), self.selection_widget)
         widget.setLayout(form_layout)
 
         # 监听选择文件信号
