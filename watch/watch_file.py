@@ -11,6 +11,7 @@ class WatchFiles(object):
     监听文件类
     """
     observer = Observer()
+    sleet_time = 1
 
     @classmethod
     def stop(cls):
@@ -40,7 +41,9 @@ class WatchFiles(object):
         try:
             # i = 0
             while cls.observer.is_alive():
-                time.sleep(1)
+                print(cls.sleet_time)
+                print(111)
+                time.sleep(cls.sleet_time)
             cls.observer.join(1)
         finally:
             cls.observer.stop()

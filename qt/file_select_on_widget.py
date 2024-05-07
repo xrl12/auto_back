@@ -5,14 +5,12 @@ from PyQt5.QtCore import pyqtSignal
 class FileSelectionWidget(QWidget):
     dir_selected = pyqtSignal(str)  # 新定义一
 
-    def __init__(self, parent, label_font, btn_button, layout: QLayout, debug: bool, choice_dir: str = None):
+    def __init__(self, parent, label_font, btn_instance, layout: QLayout, debug: bool, choice_dir: str = None):
         super().__init__(parent)
         label = QLabel(label_font)
-        self.button = QPushButton(btn_button, self)
-        # self.line_edit = QLineEdit()
-        # self.line_edit.setReadOnly(True)
+        self.button = btn_instance
 
-        layout.addRow(label, self.button)
+        layout.addRow(label, btn_instance)
         self.button.clicked.connect(self.select_file)
         if debug and not choice_dir:
             raise RuntimeError('当debug是true 当时候choice_dir是必填当')

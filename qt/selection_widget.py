@@ -27,7 +27,6 @@ class SelectionWidget(QWidget):
 
     def selectedOption(self):
         # 返回当前选中的选项的文本
-        print(self.combobox.currentData(), 'hello world')
         return self.combobox.currentData()
 
     def enteredText(self):
@@ -35,12 +34,4 @@ class SelectionWidget(QWidget):
         return self.lineedit.text()
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    items = []
-    print(TIME_UNIT)
-    time_unit_list = SettingsUtils.transfer_dict_to_list(TIME_UNIT)
-    widget = ComboBoxAndLineEditWidget(time_unit_list)
 
-    widget.show()
-    sys.exit(app.exec_())

@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 
 class ValidFileUtils(object):
@@ -26,3 +27,10 @@ class ValidFileUtils(object):
         if not path.exists():
             return False, f'{check_path}不存在，请检查'
         return True, ''
+
+    @classmethod
+    def check_time_edit(cls, str1):
+        pattern = r"(^\d+(\*\d)*\d$)"
+        compile = re.compile(pattern)
+        res = compile.match(str1)
+        return res
